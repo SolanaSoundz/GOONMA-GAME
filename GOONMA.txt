@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goonma - Latina Granny Goon Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        body {
+            margin: 0;
+            background: linear-gradient(#220022, #000000);
+            color: #ff1493;
+            font-family: 'Press Start 2P', cursive;
+            text-align: center;
+            overflow: hidden;
+            image-rendering: pixelated;
+        }
+        
+        #container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        #character-container {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            background: #111;
+            border: 8px solid #ff00ff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 40px #ff1493;
+        }
+        
+        #character {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: filter 0.3s, transform 0.2s;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(circle, transparent 40%, rgba(255,20,147,0.4) 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        
+        #energy-bar-container {
+            height: 40px;
+            background: #222;
+            border: 4px solid #ff69b4;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        #energy-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #ff00ff, #ffff00, #ff00ff);
+            transition: width 0.1s linear;
+            box-shadow: 0 0 20px #ffff00;
+        }
+        
+        #stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            font-size: 18px;
+        }
+        
+        button {
+            background: #ff1493;
+            color: white;
+            border: 4px solid #ffff00;
+            padding: 15px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 8px;
+            text-shadow: 2px 2px 0 #000;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+            background: #ff69b4;
+        }
+        
+        #log {
+            height: 140px;
+            background: #111;
+            border: 3px solid #00ffff;
+            margin: 15px 0;
+            padding: 10px;
+            text-align: left;
+            overflow-y: auto;
+            font-size: 14px;
+            color: #00ffcc;
+        }
+        
+        .pulse {
+            animation: pulse 0.5s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.12); }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1 style="text-shadow: 0 0 20px #ff1493;">GOONMA</h1>
+        <p style="color:#ff69b4; margin:5px 0 20px;">Latina Granny Dildo Gooning Simulator • Edge responsibly</p>
+        
+        <div id="character-container">
+            <img id="character" src="https://picsum.photos/id/1015/800/450" alt="Goonma Sucking" 
+                 onerror="this.src='https://via.placeholder.com/800x450/ff1493/000?text=REPLACE+WITH+YOUR+GRANNY+LOOP+(GIF/MP4)'">
+            <div class="overlay" id="overlay"></div>
+        </div>
+        
+        <div id="energy-bar-container">
+            <div id="energy-bar"></div>
+        </div>
+        
+        <div id="stats">
+            <div>ENERGY: <span id="energy-val">0</span>/<span id="max-val">1000</span></div>
+            <div>LEVEL: <span id="level-val">1</span></div>
+            <div>MULT: <span id="multi-val">x1.0</span></div>
+        </div>
+        
+        <div>
+            <button onclick="goonClick()">🔥 GOON / SUCK</button>
+            <button onclick="edgeIt()">⚡ EDGE IT</button>
+            <button onclick="buyUpgrade()">🛒 UPGRADE (50 pts)</button>
+        </div>
+        
+        <div id="log">Goonma appears... Make her work that dildo!</div>
+        
+        <button onclick="resetGame()" style="background:#333; margin-top:10px;">NEW SESSION</button>
+    </div>
+
+    <script>
+        let energy = 0;
+        let maxEnergy = 1000;
+        let level = 1;
+        let multiplier = 1.0;
+        let score = 0;
+        let upgrades = 0;
+        
+        const energyVal = document.getElementById('energy-val');
+        const maxVal = document.getElementById('max-val');
+        const levelVal = document.getElementById('level-val');
+        const multiVal = document.getElementById('multi-val');
+        const energyBar = document.getElementById('energy-bar');
+        const char = document.getElementById('character');
+        const overlay = document.getElementById('overlay');
+        const logEl = document.getElementById('log');
+        
+        function log(msg) {
+            const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            logEl.innerHTML += `<br>[${time}] ${msg}`;
+            logEl.scrollTop = logEl.scrollHeight;
+            if (logEl.children.length > 12) logEl.removeChild(logEl.children[0]);
+        }
+        
+        function updateUI() {
+            const percent = Math.min((energy / maxEnergy) * 100, 100);
+            energyBar.style.width = percent + '%';
+            energyVal.textContent = Math.floor(energy);
+            maxVal.textContent = Math.floor(maxEnergy);
+            levelVal.textContent = level;
+            multiVal.textContent = 'x' + multiplier.toFixed(1);
+            
+            if (energy > maxEnergy * 0.65) {
+                char.classList.add('pulse');
+                overlay.style.opacity = (energy / maxEnergy).toFixed(1);
+            } else {
+                char.classList.remove('pulse');
+                overlay.style.opacity = '0';
+            }
+        }
+        
+        function goonClick() {
+            const gain = Math.floor(28 * multiplier);
+            energy += gain;
+            score += gain;
+            updateUI();
+            
+            char.style.transform = 'scale(1.06)';
+            setTimeout(() => { char.style.transform = 'scale(1)'; }, 120);
+            
+            if (energy >= maxEnergy) bust();
+        }
+        
+        function edgeIt() {
+            const gain = Math.floor(85 * multiplier);
+            energy += gain;
+            multiplier += 0.35;
+            score += 55;
+            updateUI();
+            log("Edging hard... Goonma's moaning intensifies!");
+            
+            if (Math.random() < 0.4) bust();
+        }
+        
+        function buyUpgrade() {
+            if (score >= 50) {
+                score -= 50;
+                upgrades++;
+                multiplier += 0.45;
+                maxEnergy = Math.floor(maxEnergy * 1.15);
+                log("Upgrade! New dildo / technique unlocked.");
+                updateUI();
+            } else {
+                log("Need more goon points!");
+            }
+        }
+        
+        function bust() {
+            log("💦 BUSTED! Goonma drained you completely.");
+            alert(`Goonma wins! Final Score: ${score} | Level ${level} | Upgrades: ${upgrades}`);
+            resetGame();
+        }
+        
+        function levelUp() {
+            level++;
+            multiplier += 0.7;
+            energy = Math.floor(maxEnergy * 0.25);
+            maxEnergy = Math.floor(maxEnergy * 1.25);
+            log(`LEVEL UP ${level}! Goonma is addicted now...`);
+        }
+        
+        function gameLoop() {
+            if (energy > 40) energy -= 9;
+            if (energy > maxEnergy * 0.88) levelUp();
+            updateUI();
+        }
+        
+        function resetGame() {
+            energy = 0;
+            level = 1;
+            multiplier = 1.0;
+            score = 0;
+            upgrades = 0;
+            maxEnergy = 1000;
+            logEl.innerHTML = "Fresh session — Goonma is ready.";
+            updateUI();
+        }
+        
+        setInterval(gameLoop, 650);
+        
+        // Controls
+        document.addEventListener('keydown', e => {
+            if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); goonClick(); }
+            if (e.key.toLowerCase() === 'e') edgeIt();
+        });
+        
+        // Mobile swipe
+        let touchY = 0;
+        const charContainer = document.getElementById('character-container');
+        charContainer.addEventListener('touchstart', e => touchY = e.touches[0].clientY);
+        charContainer.addEventListener('touchend', e => {
+            if (e.changedTouches[0].clientY < touchY - 40) edgeIt();
+            else goonClick();
+        });
+        
+        log("Welcome, gooner. Click/space to make her suck harder. Edge at your own risk.");
+        updateUI();
+    </script>
+</body>
+</html>
