@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goonma - Latina Granny Gooning Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        body { margin:0; background:linear-gradient(#220022,#000); color:#ff1493; font-family:'Press Start 2P',cursive; text-align:center; overflow:hidden; }
+        #container { max-width:800px; margin:0 auto; padding:20px; }
+        #character-container { position:relative; width:100%; height:450px; background:#111; border:8px solid #ff00ff; border-radius:20px; overflow:hidden; box-shadow:0 0 40px #ff1493; margin-bottom:20px; }
+        #character { width:100%; height:100%; object-fit:contain; transition:transform .2s; }
+        .overlay { position:absolute; top:0; left:0; width:100%; height:100%; background:radial-gradient(circle,transparent 40%,rgba(255,20,147,0.4) 100%); opacity:0; transition:opacity .4s; pointer-events:none; }
+        #energy-bar-container { height:40px; background:#222; border:4px solid #ff69b4; margin:20px 0; }
+        #energy-bar { height:100%; width:0%; background:linear-gradient(to right,#ff00ff,#ffff00,#ff00ff); transition:width .1s linear; box-shadow:0 0 20px #ffff00; }
+        #stats { display:flex; justify-content:space-around; margin:15px 0; font-size:18px; }
+        button { background:#ff1493; color:white; border:4px solid #ffff00; padding:15px 25px; font-family:'Press Start 2P',cursive; font-size:18px; cursor:pointer; margin:8px; text-shadow:2px 2px 0 #000; }
+        button:active { transform:scale(0.95); background:#ff69b4; }
+        #log { height:140px; background:#111; border:3px solid #00ffff; margin:15px 0; padding:10px; text-align:left; overflow-y:auto; font-size:14px; color:#00ffcc; }
+        .pulse { animation:pulse .5s infinite alternate; }
+        @keyframes pulse { from { transform:scale(1); } to { transform:scale(1.12); } }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Goonma</h1>
+        <p>Latina Granny Dildo Gooning Simulator - 18+</p>
+        
+        <div id="character-container">
+            <img id="character" src="https://via.placeholder.com/800x450/ff1493/000?text=REPLACE+WITH+YOUR+GRANNY+SUCKING+LOOP+(GIF)" alt="Goonma">
+            <div class="overlay" id="overlay"></div>
+        </div>
+        
+        <div id="energy-bar-container"><div id="energy-bar"></div></div>
+        
+        <div id="stats">
+            <div>ENERGY: <span id="energy-val">0</span>/1000</div>
+            <div>LEVEL: <span id="level-val">1</span></div>
+            <div>MULT: <span id="multi-val">x1.0</span></div>
+        </div>
+        
+        <div>
+            <button onclick="goonClick()">🔥 GOON / SUCK</button>
+            <button onclick="edgeIt()">⚡ EDGE</button>
+            <button onclick="buyUpgrade()">🛒 UPGRADE (50pts)</button>
+        </div>
+        
+        <div id="log">Goonma is ready... Click to make her suck harder!</div>
+        
+        <button onclick="resetGame()" style="background:#333;">NEW SESSION</button>
+    </div>
+
+    <script>
+        let energy = 0, maxEnergy = 1000, level = 1, multiplier = 1.0, score = 0;
+        const energyVal = document.getElementById('energy-val');
+        const levelVal = document.getElementById('level-val');
+        const multiVal = document.getElementById('multi-val');
+        const energyBar = document.getElementById('energy-bar');
+        const char = document.getElementById('character');
+        const overlay = document.getElementById('overlay');
+        const logEl = document.getElementById('log');
+
+        function log(msg) {
+            const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            logEl.innerHTML += `<br>[${t}] ${msg}`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function updateUI() {
+            const p = Math.min((energy / maxEnergy) * 100, 100);
+            energyBar.style.width = p + '%';
+            energyVal.textContent = Math.floor(energy);
+            levelVal.textContent = level;
+            multiVal.textContent = 'x' + multiplier.toFixed(1);
+            
+            if (energy > maxEnergy * 0.65) {
+                char.classList.add('pulse');
+                overlay.style.opacity = '0.7';
+            } else {
+                char.classList.remove('pulse');
+                overlay.style.opacity = '0';
+            }
+        }
+
+        function goonClick() {
+            energy += Math.floor(28 * multiplier);
+            score += 28;
+            updateUI();
+            char.style.transform = 'scale(1.06)';
+            setTimeout(() => char.style.transform = 'scale(1)', 120);
+            if (energy >= maxEnergy) bust();
+        }
+
+        function edgeIt() {
+            energy += Math.floor(85 * multiplier);
+            multiplier += 0.35;
+            score += 55;
+            updateUI();
+            log("Edging... Goonma sucking harder!");
+            if (Math.random() < 0.4) bust();
+        }
+
+        function buyUpgrade() {
+            if (score >= 50) {
+                score -= 50;
+                multiplier += 0.45;
+                log("Upgrade bought!");
+                updateUI();
+            } else log("Not enough points!");
+        }
+
+        function bust() {
+            log("💦 BUSTED!");
+            alert(`Goonma drained you! Score: ${score} | Level: ${level}`);
+            resetGame();
+        }
+
+        function resetGame() {
+            energy = 0; level = 1; multiplier = 1; score = 0;
+            logEl.innerHTML = "New session started!";
+            updateUI();
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === ' ' || e.key === 'Enter') goonClick();
+            if (e.key.toLowerCase() === 'e') edgeIt();
+        });
+
+        setInterval(() => {
+            if (energy > 40) energy -= 9;
+            updateUI();
+        }, 650);
+
+        log("Welcome! Space/Click = Goon, E = Edge. Replace the image with your loop.");
+        updateUI();
+    </script>
+</body>
+</html>
